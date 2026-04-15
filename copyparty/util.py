@@ -1501,8 +1501,7 @@ class Garda(object):
             return 0, ip
 
         if ":" in ip:
-            # assume /64 clients; drop 4 groups
-            ip = IPv6Address(ip).exploded[:-20]
+            ip = ipnorm(ip)
 
         if prev and self.uniq:
             if self.prev.get(ip) == prev:
@@ -2445,8 +2444,8 @@ def odfusion(
 
 def ipnorm(ip: str) -> str:
     if ":" in ip:
-        # assume /64 clients; drop 4 groups
-        return IPv6Address(ip).exploded[:-20]
+        # assume /56 clients; drop final 72 bits
+        return str(IPv6Network(ip + "/56", strict=False).network_address)
 
     return ip
 
