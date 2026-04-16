@@ -3719,12 +3719,12 @@ class HttpCli(object):
 
                 fdir = fdir_base
                 fname = sanitize_fn(p_file or "")
-                abspath = os.path.join(fdir, fname)
                 suffix = "-%.6f-%s" % (time.time(), dip)
                 if p_file and not nullwrite:
                     if rnd:
                         fname = rand_name(fdir, fname, rnd)
 
+                    abspath = os.path.join(fdir, fname)
                     open_args = {"fdir": fdir, "suffix": suffix, "vf": vfs.flags}
 
                     if "replace" in self.uparam or "replace" in self.headers:
@@ -3742,7 +3742,7 @@ class HttpCli(object):
                     tnam = fname = os.devnull
                     fdir = abspath = ""
 
-                if xbu:
+                if xbu and abspath:
                     at = time.time() - lifetime
                     hr = runhook(
                         self.log,
@@ -3790,7 +3790,7 @@ class HttpCli(object):
                             else:
                                 open_args["fdir"] = fdir
 
-                if p_file and not nullwrite:
+                if abspath:
                     bos.makedirs(fdir, vf=vfs.flags)
 
                     # reserve destination filename
@@ -3844,9 +3844,15 @@ class HttpCli(object):
                             fname = os.devnull
                             raise
 
-                    if not nullwrite:
-                        atomic_move(self.log, tabspath, abspath, vfs.flags)
+                    self.conn.nbyte += sz
+                    if not abspath:
+                        files.append(
+                            (sz, sha_hex, sha_b64, p_file or "(discarded)", fname, "")
+                        )
+                        tabspath = ""
+                        continue
 
+                    atomic_move(self.log, tabspath, abspath, vfs.flags)
                     tabspath = ""
 
                     at = time.time() - lifetime
@@ -3901,9 +3907,7 @@ class HttpCli(object):
                                 abspath = ap2
                         sz = bos.path.getsize(abspath)
 
-                    files.append(
-                        (sz, sha_hex, sha_b64, p_file or "(discarded)", fname, abspath)
-                    )
+                    files.append((sz, sha_hex, sha_b64, p_file, fname, abspath))
                     dbv, vrem = vfs.get_dbv(rem)
                     self.conn.hsrv.broker.say(
                         "up2k.hash_file",
@@ -3917,7 +3921,6 @@ class HttpCli(object):
                         self.uname,
                         True,
                     )
-                    self.conn.nbyte += sz
 
                 except Pebkac:
                     self.parser.drop()
