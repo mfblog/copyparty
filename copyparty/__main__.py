@@ -969,6 +969,7 @@ def get_sects():
             values for --urlform:
               \033[36mstash\033[35m dumps the data to file and returns length + checksum
               \033[36msave,get\033[35m dumps to file and returns the page like a GET
+              \033[36mget\033[35m ignores the message and returns the page like a GET
               \033[36mprint    \033[35m prints the data to log and returns an error
               \033[36mprint,xm \033[35m prints the data to log and returns --xm output
               \033[36mprint,get\033[35m prints the data to log and returns GET\033[0m
