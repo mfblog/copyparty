@@ -4145,6 +4145,8 @@ var fileman = (function () {
 			if (this.textContent == 'write-only')
 				for (var a = 0; a < pbtns.length; a++)
 					clmod(pbtns[a], 'on', pbtns[a].textContent == 'write');
+			if (this.textContent == 'get' && clgot(this, 'on') && has(perms, 'read'))
+				clmod(pbtns[0], 'on');
 		}
 		clmod(pbtns[0], 'on', 1);
 
@@ -8033,12 +8035,17 @@ function apply_perms(res) {
 	a.style.display = '';
 	tt.att(QS('#ops'));
 
+	var v_perms = perms.slice(0);
+	var have_read = has(perms, 'read');
+	if (have_read)
+		apop(v_perms, 'get');
+
 	for (var a = 0; a < chk.length; a++)
-		if (has(perms, chk[a]))
+		if (has(v_perms, chk[a]))
 			axs.push(chk[a].slice(0, 1).toUpperCase() + chk[a].slice(1));
 
 	axs = axs.join('-');
-	if (perms.length == 1) {
+	if (v_perms.length == 1) {
 		aclass = ' class="warn">';
 		axs += '-Only';
 	}
@@ -8080,7 +8087,6 @@ function apply_perms(res) {
 	document.body.setAttribute('perms', perms.join(' '));
 
 	var have_write = has(perms, "write"),
-		have_read = has(perms, "read"),
 		de = document.documentElement,
 		tds = QSA('#u2conf td');
 
