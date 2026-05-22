@@ -985,7 +985,9 @@ class SvcHub(object):
     def after_httpsrv_up(self) -> None:
         self.up2k.init_vols()
 
-        Daemon(self.sd_notify, "sd-notify")
+        zb = os.environ.get("NOTIFY_SOCKET")
+        if zb:
+            Daemon(self.sd_notify, "sd-notify", (zb,))
 
         zb = os.environ.get("S6_NOTIFY_FD")
         if zb:
@@ -1882,12 +1884,8 @@ class SvcHub(object):
             self.log("svchub", "cannot efficiently use multiple CPU cores")
             return False
 
-    def sd_notify(self) -> None:
+    def sd_notify(self, zb: bytes) -> None:
         try:
-            zb = os.environ.get("NOTIFY_SOCKET")
-            if not zb:
-                return
-
             addr = unicode(zb)
             if addr.startswith("@"):
                 addr = "\0" + addr[1:]
@@ -1899,7 +1897,8 @@ class SvcHub(object):
             sck.connect(addr)
             sck.sendall(b"READY=1")
         except:
-            self.log("sd_notify", min_ex())
+            t = "NOTIFY_SOCKET=%s:\n%s"
+            self.log("sd-notify", t % (zb, min_ex()), 1)
 
     def s6_notify(self, zb: bytes) -> None:
         try:
