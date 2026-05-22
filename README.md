@@ -242,6 +242,11 @@ you may also want these, especially on servers:
 * [nixos module](#nixos-module) to run copyparty on NixOS hosts
 * [contrib/nginx/copyparty.conf](contrib/nginx/copyparty.conf) to [reverse-proxy](#reverse-proxy) behind nginx (for better https)
 
+because the following environment variables are commonly used in service-scripts, they are understood by copyparty:
+
+* `NOTIFY_SOCKET` as provided by systemd with service type=notify (see systemd/copyparty.service above)
+* `S6_NOTIFY_FD` for s6/dinit [`ready-notification = pipevar:S6_NOTIFY_FD`](https://skarnet.org/software/s6/notifywhenup.html)
+
 and remember to open the ports you want; here's a complete example including every feature copyparty has to offer:
 ```
 firewall-cmd --permanent --add-port={80,443,3921,3922,3923,3945,3990}/tcp  # --zone=libvirt
