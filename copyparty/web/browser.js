@@ -10036,7 +10036,7 @@ function reload_browser() {
 		if (e.target.closest('#widget,#ops,.opview,.doc')) return;
 
 		if (e.target.closest('#gfiles'))
-			ebi('gfiles').style.userSelect = "none"
+			ebi('gfiles').style.userSelect = "none";
 
 		var pos = getpp(e);
 		startx = pos.x;
@@ -10077,7 +10077,9 @@ function reload_browser() {
 			return;
 		}
 		if (!dragging && dist > mvthresh && !window.getSelection().toString()) {
-			if (fwrap = e.target.closest('#wrap')) 
+			if (e.target instanceof Element)
+				fwrap = e.target.closest('#wrap');
+			if (fwrap) 
 				fwrap.style.userSelect = 'none';
 			else return;
 			start_drag();
@@ -10121,7 +10123,8 @@ function reload_browser() {
 
 		window.addEventListener('dragstart', function(e) {
 			if (treectl.dsel && (is_selma || dragging)) {
-				e.preventDefault();
+				if (!QS('body.bbox-open'))
+					ev(e);
 			}
 		});
 	}
