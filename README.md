@@ -1336,9 +1336,15 @@ using arguments or config files, or a mix of both:
 
 sleep better at night  by telling copyparty to periodically check whether your version has a [known vulnerability](https://github.com/9001/copyparty/security/advisories)
 
-this feature can be enabled by setting the global-option `--vc-url` to one of the following URLs; all of them provide the same information, so which one you choose is whatever
-* `https://api.copyparty.eu/advisories`
-* `https://api.github.com/repos/9001/copyparty/security-advisories?per_page=9`
+this feature can be enabled by setting the global-option `--vc-url` to one of the following URLs; choose what severity level you want to be notified for:
+* `https://api.copyparty.eu/advisories-panic` -- only really bad stuff, the "UPGRADE NOW" kind
+* `https://api.copyparty.eu/advisories` -- everything important / noteworthy, "upgrade when you can"
+* `https://api.copyparty.eu/advisories-all` -- *everything*, including stuff that's unlikely to affect anyone
+* `https://api.github.com/repos/9001/copyparty/security-advisories?per_page=9` -- same as `advisories-all`
+
+note that `https://api.copyparty.eu/advisories` may (for example) skip some advisories rated `High` but include some `Low`; that's because an easily-reachable `Low` in a default-enabled feature is more severe than a `High` which is a theoretical bug in a contrived use of a fringe feature, but the CVE calculator would still classify that as `High`
+
+if you want to use the github advisory feed but only care about advisories rated `medium`/`moderate` or higher, then global-option `--vc-sev medium` does that, but see previous paragraph
 
 > to see what happens when a bad version is detected, try `--vc-url https://api.copyparty.eu/advisories-test`
 
@@ -1354,6 +1360,7 @@ config file example:
   vc-url: https://api.copyparty.eu/advisories
   vc-age: 3  # how many hours to wait between each check
   vc-exit    # emergency-exit if current version is vulnerable
+  vc-sev: medium  # only care about severity 'Medium'/'Moderate' or higher (github-only; don't use this with api.copyparty.eu)
 ```
 
 

@@ -1237,6 +1237,7 @@ def add_general(ap, nc, srvname):
     ap2.add_argument("--reload-sig", metavar="S", type=u, default=("" if ANYWIN else "USR1"), help="reload server config when unix-signal \033[33mS\033[0m is received; examples: [\033[32mSIGUSR1\033[0m], [\033[32mUSR1\033[0m], [\033[32m10\033[0m]")
     ap2.add_argument("--vc-url", metavar="URL", type=u, default="", help="URL to check for vulnerable versions (default-disabled)")
     ap2.add_argument("--vc-age", metavar="HOURS", type=int, default=3, help="how many hours to wait between vulnerability checks")
+    ap2.add_argument("--vc-sev", metavar="LEVEL", type=u, default="low", help="minimum severity to care about; one of these: \033[32mlow medium high critical\033[0m")
     ap2.add_argument("--vc-exit", action="store_true", help="panic and exit if current version is vulnerable")
     ap2.add_argument("--license", action="store_true", help="show licenses and exit")
     ap2.add_argument("--version", action="store_true", help="show versions and exit")

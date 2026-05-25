@@ -119,6 +119,8 @@ VER_IDP_DB = 1
 VER_SESSION_DB = 1
 VER_SHARES_DB = 2
 
+CVE_SEVS = {"low": 1, "medium": 2, "moderate": 2, "high": 3, "critical": 4}
+
 
 class SvcHub(object):
     """
@@ -297,6 +299,9 @@ class SvcHub(object):
                 zi = 3
                 self.log("root", "vc-age too low for copyparty.eu; will use 3 hours")
             args.vc_age = zi
+
+        if args.vc_sev and args.vc_sev not in CVE_SEVS:
+            self.log("root", "vc-sev %r invalid; will use 'low'" % (args.vc_sev,), 3)
 
         zs = ""
         if args.th_ram_max < 0.22:
@@ -1948,6 +1953,7 @@ class SvcHub(object):
         next_chk = 0
         # self.args.vc_age = 2 / 60
         fpath = os.path.join(self.E.cfg, "vuln_advisory.json")
+        minsev = CVE_SEVS.get(self.args.vc_sev, 0)
         while not self.stopping:
             now = time.time()
             if now < next_chk:
@@ -1991,9 +1997,12 @@ class SvcHub(object):
                 continue
 
             try:
+                sver = "0.1"
                 advisories = json.loads(jtxt)
                 for adv in advisories:
                     if adv.get("state") == "closed":
+                        continue
+                    if CVE_SEVS.get(adv.get("severity"), 9) < minsev:
                         continue
                     vuln = {}
                     for x in adv["vulnerabilities"]:
@@ -2012,9 +2021,8 @@ class SvcHub(object):
                         if self.args.vc_exit:
                             self.sigterm()
                         return
-                    else:
-                        t = "%sok; v%s and newer is safe"
-                        self.log("ver-chk", t % (src, sver), 2)
+                t = "%sok; v%s and newer is safe"
+                self.log("ver-chk", t % (src, sver), 2)
                 next_chk = time.time() + self.args.vc_age * 3600 - age
             except Exception as e:
                 t = "failed to process vulnerability advisory; %s"
