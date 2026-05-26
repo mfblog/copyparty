@@ -790,7 +790,7 @@ class ThumbSrv(object):
                 )
         finally:
             if p and p.poll() is None:
-                p.kill(9)
+                p.kill()
 
     def _conv_rawpy(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
         self.wait4ram(0.6, tpath)

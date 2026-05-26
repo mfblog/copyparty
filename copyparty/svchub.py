@@ -1477,7 +1477,12 @@ class SvcHub(object):
                 continue
             zi = signame2int(zs)
             setattr(self, mem, zi)
-            sigs.append(zi)
+            try:
+                sigs.append(signal.Signals(zi))
+            except:
+                t = "using unknown signal %r as %s"
+                self.log("root", t % (zi, mem), 3)
+                sigs.append(zi)
 
         for sig in sigs:
             signal.signal(sig, self.signal_handler)

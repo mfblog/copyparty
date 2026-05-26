@@ -46,7 +46,7 @@ except:
     HAVE_MUTAGEN = False
 
 
-def have_ff(name: str) -> bool:
+def have_ff(name: str) -> bytes:
     uname = name.upper()
     if os.environ.get("PRTY_NO_" + uname):
         return b""
@@ -55,7 +55,7 @@ def have_ff(name: str) -> bool:
     try:
         bcmd = (ebin or name).encode("utf-8")
     except:
-        bcmd = ebin or name
+        bcmd: bytes = ebin or name
 
     if ANYWIN and not ebin:
         bcmd += b".exe"
